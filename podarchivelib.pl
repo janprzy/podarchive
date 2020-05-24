@@ -14,15 +14,13 @@ sub downloadFeed
     
     # Download the RSS feed
     my $feed_file = $target."/feed.rss";
-    
-    #our $opt_keep;
-    unless($opt_keep)
+    unless($opt_keep && -e $feed_file)
     {
         downloadFile($source, $feed_file);
     }
     else
     {
-        unless($opt_quiet){print("Keeping preexisting feed file\n")}
+        printv("Keeping preexisting feed file\n");
     }
     
     my $parser = XML::RSS::Parser->new;
@@ -30,7 +28,7 @@ sub downloadFeed
     my $feed = $parser->parse_file($filehandle); # https://metacpan.org/pod/XML::RSS::Parser::Feed
     
     # Iterate over the items
-    my $ignored;
+    my $ignoredcount, $downloadcount;
     foreach my $item ($feed->items) # https://metacpan.org/pod/XML::RSS::Parser::Element
     {
         # Get important data from the item
@@ -47,29 +45,31 @@ sub downloadFeed
         # The existence of each individual file will be checked again in case only one of them was missing.
         unless(-e $description_path && -e $audio_path)
         {
-            print($title.", published on ".$date."\n");
+            printv($title.", published on ".$date."\n");
         
             # Write show notes
             unless(-e $description_path)
             {
-                print("\tWriting show notes to ".$description_path."\n");
-                string_to_file($description, $description_path);
+                printv("\tWriting show notes to ".$description_path."\n",1);
+                unless($opt_dry){string_to_file($description, $description_path)}
             }
             else
             {
-                print("Show notes already exist at ".$description_path);
+                printv("Show notes already exist at ".$description_path);
             }
         
             # Download Audio file
             unless(-e $audio_path)
             {
-                print("\tDownloading ".$url." to ".$audio_path."\n");
-                downloadFile($url, $audio_path);
+                printv("\tDownloading ".$url." to ".$audio_path."\n",1);
+                unless($opt_dry){downloadFile($url, $audio_path)}
             }
             else
             {
-                print("Audio already exists at ".$audio_path);
+                printv("Audio already exists at ".$audio_path);
             }
+            
+            $downloadcount++;
         }
         else
         {
@@ -77,8 +77,12 @@ sub downloadFeed
         }
     }
     
-    # Print number of ignored episodes
-    unless($opt_quiet){ print("Ignored ".$ignorecount." items that have already been downloaded.\n")}
+    # Print stats
+    printv("Downloaded ".$downloadcount." new episodes\n");
+    if($ignorecount>0)
+    {
+        printv("Ignored ".$ignorecount." items that have already been downloaded.\n");
+    }
 }
 
 # Download a file

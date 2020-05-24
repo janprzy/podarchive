@@ -1,6 +1,6 @@
 README
 ======
-This is a simple script to archive podcasts. It takes the URL as of an RSS feed and the path of a target directory as arguments.
+This is a simple script to archive podcasts. It takes the URL of an RSS feed and the path of a target directory as arguments.
 If an episode is already downloaded, it will not be downloaded again. This is determined by the filename.
 
 

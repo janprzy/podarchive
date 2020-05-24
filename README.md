@@ -4,7 +4,7 @@ This is a simple script to archive podcasts. It takes the URL of an RSS feed and
 
 If an episode is already downloaded, it will not be downloaded again, unless the -f/--force flag is set.
 
-If an episode is already present is determined by the filename, meaning the script will decide how it _would_ name the file where it do be downloaded, then see if that file already exists.
+If an episode is already present is determined by the filename. The script will decide how it _would_ name the file were it to be  downloaded, then see if that file already exists.
 
 
 For each episode, two files will be created:

@@ -16,7 +16,6 @@ sub downloadFeed
     my $feed_file = $target."/feed.rss";
     downloadFile($source, $feed_file);
 
-    
     my $parser = XML::RSS::Parser->new;
     my $filehandle = FileHandle->new($feed_file);
     my $feed = $parser->parse_file($filehandle); # https://metacpan.org/pod/XML::RSS::Parser::Feed

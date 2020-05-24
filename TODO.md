@@ -5,6 +5,7 @@ TODO
 * Publishing date in file name
 * Progress bar
 * RSS feeds could be very large, only download if necessary
+* Also archive images embedded in the show notes
 * More options
     - File format
     - Ignore show notes

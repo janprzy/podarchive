@@ -22,7 +22,7 @@ sub downloadFeed
     }
     else
     {
-        print("Keeping preexisting feed\n");
+        unless($opt_quiet){print("Keeping preexisting feed file\n")}
     }
     
     my $parser = XML::RSS::Parser->new;
@@ -76,7 +76,9 @@ sub downloadFeed
             $ignorecount++;
         }
     }
-    print("Ignored ".$ignorecount." items that have already been downloaded.\n");
+    
+    # Print number of ignored episodes
+    unless($opt_quiet){ print("Ignored ".$ignorecount." items that have already been downloaded.\n")}
 }
 
 # Download a file

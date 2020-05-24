@@ -9,7 +9,7 @@ use Filehandle;
 # $target is the directory it should be saved to
 sub downloadFeed
 {
-    if(@_ < 2) {die("Not enough arguments supplied to fetchFeed()")}
+    if(@_ < 2) {die("Not enough arguments supplied to downloadFeed()")}
     my ($source, $target) = @_;    
     
     my $feed_file = $target."/feed.rss";
@@ -25,6 +25,7 @@ sub downloadFeed
     my $feed = $parser->parse_file($filehandle); # https://metacpan.org/pod/XML::RSS::Parser::Feed
     
     # Iterate over the items
+    my $ignored;
     foreach my $item ($feed->items) # https://metacpan.org/pod/XML::RSS::Parser::Element
     {
         # Get important data from the item
@@ -33,42 +34,55 @@ sub downloadFeed
         my $url   = $item->query('enclosure')->attribute_by_qname("url");
         my $description = $item->query('description')->text_content;
         
-        print($title.", published on ".$date."\n");
-        
-        # Write show notes to file
+        # Target paths for this episode
         my $description_path = $target."/".$title.".description.html";
-        print("\tWill write show notes to ".$description_path."\n");
-        
-        unless(-e $description_path)
-        {
-            string_to_file($description, $description_path);
-        }
-        else
-        {
-            print("\t\t[Already exists]\n");
-        }
-        
-        # Download Audio file
         my $audio_path = $target."/".$title." - ".basename($url);
-        print("\tWill download ".$url." to ".$audio_path."\n");
         
-        unless(-e $audio_path)
+        # Ignore episodes that have already been downloaded
+        # The existence of each individual file will be checked again in case only one of them was missing.
+        unless(-e $description_path && -e $audio_path)
         {
-            downloadFile($url, $audio_path);
+            print($title.", published on ".$date."\n");
+        
+            # Write show notes
+            unless(-e $description_path)
+            {
+                print("\tWriting show notes to ".$description_path."\n");
+                string_to_file($description, $description_path);
+            }
+            else
+            {
+                print("Show notes already exist at ".$description_path);
+            }
+        
+            # Download Audio file
+            unless(-e $audio_path)
+            {
+                print("\tDownloading ".$url." to ".$audio_path."\n");
+                downloadFile($url, $audio_path);
+            }
+            else
+            {
+                print("Audio already exists at ".$audio_path);
+            }
         }
         else
         {
-            print("\t\t[Already exists]\n");
+            $ignorecount++;
         }
     }
+    
+    print("Ignored ".$ignorecount." items that have already been downloaded.\n");
 }
 
 # Download a file
 # Output is the target filename
 sub downloadFile
 {
-    if(@_ < 2) {die("Not enough arguments supplied to fetchFile()")}
+    if(@_ < 2){die("Not enough arguments supplied to fetchFile()")}
     my ($source, $output) = @_;
+    
+    if(-e $output){die("Could not download ".$source." to ".$output.", it already exists.")}
     
     my $output_dir = dirname($output);
     

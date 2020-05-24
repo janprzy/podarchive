@@ -2,12 +2,17 @@
 use strict;
 use warnings;
 
+# Get the parent directory of this file.
+# This will allow us to run it from anywhere, it will still be able to include other files in this directory
+# https://perldoc.perl.org/FindBin.html
+use FindBin qw($Bin);
+
 use Data::Dumper;
 
 use Getopt::Long; # Docs: https://perldoc.perl.org/Getopt/Long.html#Mixing-command-line-option-with-other-arguments
 Getopt::Long::Configure ("bundling");
 
-require "./podarchivelib.pl";
+require $Bin."/podarchivelib.pl";
 
 # Command line options
 our($opt_keep, $opt_date, $opt_verbose, $opt_quiet, $opt_dry, $opt_force, $opt_help);

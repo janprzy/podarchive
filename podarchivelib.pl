@@ -14,8 +14,17 @@ sub downloadFeed
     
     # Download the RSS feed
     my $feed_file = $target."/feed.rss";
-    downloadFile($source, $feed_file);
-
+    
+    #our $opt_keep;
+    unless($opt_keep)
+    {
+        downloadFile($source, $feed_file);
+    }
+    else
+    {
+        print("Keeping preexisting feed\n");
+    }
+    
     my $parser = XML::RSS::Parser->new;
     my $filehandle = FileHandle->new($feed_file);
     my $feed = $parser->parse_file($filehandle); # https://metacpan.org/pod/XML::RSS::Parser::Feed
@@ -67,7 +76,6 @@ sub downloadFeed
             $ignorecount++;
         }
     }
-    
     print("Ignored ".$ignorecount." items that have already been downloaded.\n");
 }
 
@@ -78,7 +86,8 @@ sub downloadFile
     if(@_ < 2){die("Not enough arguments supplied to fetchFile()")}
     my ($source, $output) = @_;
     
-    if(-e $output){die("Could not download ".$source." to ".$output.", it already exists.")}
+    # Die if file already exists, this function will not overwrite
+    # if(-e $output){die("Could not download ".$source." to ".$output.", it already exists.")}
     
     my $output_dir = dirname($output);
     
@@ -105,6 +114,5 @@ sub string_to_file
     open (FILE, "> ".$file) or die("Failed to open file for writing: ".$!);
     print FILE $string;
     close(FILE);
-    
 }
 1;

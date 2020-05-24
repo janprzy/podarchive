@@ -16,4 +16,4 @@ and
 Usage
 -----
     cd podcast-archiver
-    ./cli.pl [RSS feed URL] [desired target directory]
+    ./cli.pl [options] rss_feed_url target_directory

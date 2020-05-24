@@ -32,6 +32,7 @@ unless($source && $target)
     die("Not enough arguments! Both an RSS feed and a target directory are required\n");
 }
 
+# TODO: Create directory if it doesn't exist, only fail if the parent directory is also missing
 unless(-d $target)
 {
     die($target." is not a valid target directory!\n");

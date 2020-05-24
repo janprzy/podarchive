@@ -1,10 +1,9 @@
 #!/usr/bin/perl
 use File::Fetch; # https://perldoc.perl.org/File/Fetch.html
-use File::Copy;
 use File::Basename;
 use XML::RSS::Parser; # https://metacpan.org/pod/XML::RSS::Parser
 use Filehandle;
-use Time::Piece;
+use DateTime::Format::RSS;
 
 # Prevent "wide character in string" messages (some show notes contain Emojis and other UTF-8 characters)
 use open qw(:std :utf8);
@@ -21,11 +20,12 @@ sub downloadFeed
     my $feed_file = $target."/feed.rss";
     unless($opt_keep && -e $feed_file)
     {
+        printv("Downloading feed\n",1);
         downloadFile($source, $feed_file);
     }
     else
     {
-        printv("Keeping preexisting feed file\n");
+        printv("Keeping preexisting feed file\n",1);
     }
     
     my $parser = XML::RSS::Parser->new;
@@ -38,22 +38,31 @@ sub downloadFeed
     {
         # Get important data from the item
         my $title = $_->query('title')->text_content;
-        my $date  = $_->query('pubDate')->text_content;
-        # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
-        #$date = Time::Piece->strptime($date, )->strftime("%Y%m%d");
+        
+        # Prepend the publishing date to the title and the filename
+        if($opt_date)
+        {
+            my $date  = $_->query('pubDate')->text_content;
+            
+            # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
+            $date = DateTime::Format::RSS->parse_datetime($date)->ymd;
+        
+            $title = $date." - ".$title;
+        }
         
         my $url   = $_->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
         my $description = $_->query('description')->text_content;
         
         # Target paths for this episode
-        my $description_path = $target."/".$title.".description.html";
-        my $audio_path = $target."/".$title." - ".basename($url);
+        my $clean_title = clean_filename($title);
+        my $description_path = $target."/".$clean_title.".description.html";
+        my $audio_path = $target."/".$clean_title." - ".basename($url);
         
         # Ignore episodes that have already been downloaded
         # The existence of each individual file will be checked again in case only one of them was missing.
         unless(-e $description_path && -e $audio_path)
         {
-            printv($title.", published on ".$date."\n");
+            printv($title."\n");
         
             # Write show notes
             unless(-e $description_path)
@@ -63,7 +72,7 @@ sub downloadFeed
             }
             else
             {
-                printv("Show notes already exist at ".$description_path);
+                printv("Show notes already exist at ".$description_path."\n");
             }
         
             # Download Audio file
@@ -74,7 +83,7 @@ sub downloadFeed
             }
             else
             {
-                printv("Audio already exists at ".$audio_path);
+                printv("Audio already exists at ".$audio_path."\n");
             }
             
             $downloadcount++;
@@ -86,8 +95,11 @@ sub downloadFeed
     }
     
     # Print stats
-    printv("Downloaded ".$downloadcount." new episodes\n");
-    if($ignorecount>0)
+    if($downloadcount > 0)
+    {
+        printv("Downloaded ".$downloadcount." new episodes\n");
+    }
+    if($ignorecount > 0)
     {
         printv("Ignored ".$ignorecount." items that have already been downloaded.\n");
     }
@@ -109,7 +121,7 @@ sub downloadFile
 
     # The file will be downloaded to $output_dir, then renamed to $output
     my $temp = $ff->fetch(to=>$output_dir) or die($ff->error);
-    move($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
+    rename($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
 }
 
 # Write a given string to a new file. Existing files will not be overwritten.
@@ -129,4 +141,31 @@ sub string_to_file
     print(FILE $string);
     close(FILE);
 }
+
+# Replace all non-alphanumeric characters with "-"
+# https://perldoc.perl.org/perlre.html
+sub clean_filename
+{
+    my $filename = shift;
+    print($filename);
+    
+    if(defined($filename))
+    {
+        # Replace everything with a dash (-) that is not a letter, number, dash, dot or space
+        $filename =~ s/[^A-Za-z0-9\-\.\s]/-/g;
+        
+        # If a dash has whitespace on ONE side, remove that whitespace
+        # This occurs, for example, when the original string contained a number followed by a colon
+        # Example: abc 1- abc -> abc 1-abc
+        # Do NOT match abc - abc
+        # (?<!\s) = negativ lookbehind
+        $filename =~ s/(?<!\s)-\s/ - /g;
+        
+        # (?!\s) = negative lookahead
+        $filename =~ s/\s-(?!\s)/ - /g;
+    }
+    return($filename);
+}
+
+
 1;

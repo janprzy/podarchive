@@ -10,8 +10,9 @@ Getopt::Long::Configure ("bundling");
 require "./podarchivelib.pl";
 
 # Command line options
-our($opt_keep, $opt_verbose, $opt_quiet, $opt_dry, $opt_help);
+our($opt_keep, $opt_date, $opt_verbose, $opt_quiet, $opt_dry, $opt_help);
 GetOptions('keep|k' => \$opt_keep,
+           'date|d' => \$opt_date,
            'verbose|v' => \$opt_verbose,
            'quiet|q' => \$opt_quiet,
            'dry-run|n' => \$opt_dry,
@@ -20,8 +21,8 @@ GetOptions('keep|k' => \$opt_keep,
 
 if($opt_help)
 {
-	# Print help
     print_help();
+    exit;
 }
 
 my($source, $target)=@ARGV;
@@ -44,6 +45,7 @@ sub print_help
 {
     print("Allowed options:
 --keep, -k: Don't refresh the feed file if it has already been downloaded
+--date, -d: Prepend the publishing date to the filename for improved sorting
 --verbose, -v: Display more information about what's happening
 --quiet, -q: Only display errors
 --dry-run, -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
@@ -51,7 +53,6 @@ sub print_help
 [Feed URL]
 [Target directory]
 ");
-    exit;
 }
 
 # Print with 3 different verbosities

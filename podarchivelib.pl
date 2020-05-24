@@ -12,13 +12,10 @@ sub downloadFeed
     if(@_ < 2) {die("Not enough arguments supplied to downloadFeed()")}
     my ($source, $target) = @_;    
     
+    # Download the RSS feed
     my $feed_file = $target."/feed.rss";
-    
-    # Don't download again if it already exists (just for debugging, a real feed would obviously be updated regularly
-    unless(-e $feed_file)
-    {
-        downloadFile($source, $feed_file);
-    }
+    downloadFile($source, $feed_file);
+
     
     my $parser = XML::RSS::Parser->new;
     my $filehandle = FileHandle->new($feed_file);

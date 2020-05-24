@@ -97,7 +97,7 @@ sub downloadFeed
 # $output is the target filename
 sub downloadFile
 {
-    if(@_ < 2){die("Not enough arguments supplied to fetchFile()")}
+    if(@_ < 2){die("Not enough arguments supplied to downloadFile()")}
     my ($source, $output) = @_;
     
     # Die if file already exists, this function will not overwrite

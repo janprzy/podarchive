@@ -58,14 +58,14 @@ sub downloadFeed
         my $description_path = $target."/".$clean_title.".description.html";
         my $audio_path = $target."/".$clean_title." - ".basename($url);
         
-        # Ignore episodes that have already been downloaded
+        # Ignore episodes that have already been downloaded, unless $opt_force is true
         # The existence of each individual file will be checked again in case only one of them was missing.
-        unless(-e $description_path && -e $audio_path)
+        unless((-e $description_path && -e $audio_path) && !$opt_force)
         {
             printv($title."\n");
         
             # Write show notes
-            unless(-e $description_path)
+            unless(-e $description_path && !$opt_force)
             {
                 printv("\tWriting show notes to ".$description_path."\n",1);
                 unless($opt_dry){string_to_file($description, $description_path)}
@@ -76,7 +76,7 @@ sub downloadFeed
             }
         
             # Download Audio file
-            unless(-e $audio_path)
+            unless(-e $audio_path && !$opt_force)
             {
                 printv("\tDownloading ".$url." to ".$audio_path."\n",1);
                 unless($opt_dry){downloadFile($url, $audio_path)}
@@ -90,6 +90,8 @@ sub downloadFeed
         }
         else
         {
+            # Display ignored episodes in verbose mode
+            printv("Ignoring: ".$title."\n",1);
             $ignorecount++;
         }
     }
@@ -101,7 +103,7 @@ sub downloadFeed
     }
     if($ignorecount > 0)
     {
-        printv("Ignored ".$ignorecount." items that have already been downloaded.\n");
+        printv("Ignored ".$ignorecount." episodes\n");
     }
 }
 
@@ -147,7 +149,6 @@ sub string_to_file
 sub clean_filename
 {
     my $filename = shift;
-    print($filename);
     
     if(defined($filename))
     {
@@ -158,13 +159,14 @@ sub clean_filename
         # This occurs, for example, when the original string contained a number followed by a colon
         # Example: abc 1- abc -> abc 1-abc
         # Do NOT match abc - abc
-        # (?<!\s) = negativ lookbehind
+        # (?<!\s) = negative lookbehind
         $filename =~ s/(?<!\s)-\s/ - /g;
         
         # (?!\s) = negative lookahead
         $filename =~ s/\s-(?!\s)/ - /g;
+        
+        return($filename);
     }
-    return($filename);
 }
 
 

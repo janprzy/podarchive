@@ -9,5 +9,4 @@ TODO
     - File format
         - Don't append original filename
     - Ignore show notes
-    - Force redownload
     - Make regex-cleaning of the filename optional

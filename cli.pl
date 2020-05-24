@@ -10,12 +10,13 @@ Getopt::Long::Configure ("bundling");
 require "./podarchivelib.pl";
 
 # Command line options
-our($opt_keep, $opt_date, $opt_verbose, $opt_quiet, $opt_dry, $opt_help);
+our($opt_keep, $opt_date, $opt_verbose, $opt_quiet, $opt_dry, $opt_force, $opt_help);
 GetOptions('keep|k' => \$opt_keep,
            'date|d' => \$opt_date,
            'verbose|v' => \$opt_verbose,
            'quiet|q' => \$opt_quiet,
            'dry-run|n' => \$opt_dry,
+           'force|f' => \$opt_force,
            'help|h' => \$opt_help,
            );
 
@@ -43,13 +44,14 @@ downloadFeed($source, $target);
 
 sub print_help
 {
-    print("Allowed options:
---keep, -k: Don't refresh the feed file if it has already been downloaded
---date, -d: Prepend the publishing date to the filename for improved sorting
+    print("Command usage:
+--keep,    -k: Don't refresh the feed file if it has already been downloaded
+--date,    -d: Prepend the publishing date to the filename for improved sorting
 --verbose, -v: Display more information about what's happening
---quiet, -q: Only display errors
+--quiet,   -q: Only display errors
 --dry-run, -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
---help, h: Display this help
+--force,   -f: Force redownload of all episodes regardless if they're already downloaded
+--help,    -h: Display this help
 [Feed URL]
 [Target directory]
 ");

@@ -17,3 +17,16 @@ Usage
 -----
     cd podcast-archiver
     ./cli.pl [options] rss_feed_url target_directory
+    
+    
+Valid arguments
+---------------
+--keep,    -k: Don't refresh the feed file if it has already been downloaded
+--date,    -d: Prepend the publishing date to the filename for improved sorting
+--verbose, -v: Display more information about what's happening, e.g. the exact file names being written to
+--quiet,   -q: Only display errors, you can use this when running from cron
+--dry-run, -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
+--force,   -f: Force redownload of all episodes regardless if they're already downloaded. This does not override dry-run and can be used in conjunction with it.
+--help,    -h: Display this help
+[Feed URL]
+[Target directory]

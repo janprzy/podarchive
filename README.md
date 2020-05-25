@@ -25,6 +25,7 @@ Usage
 Valid arguments
 ---------------
 You can try them out by using the -n|--dry-run flag
+
     --keep,    -k: Don't refresh the feed file if it has already been downloaded
     --date,    -d: Prepend the publishing date to the filename for improved sorting
     --date-behind: If -d is set, the date will be appended instead of prepended. Implies -d

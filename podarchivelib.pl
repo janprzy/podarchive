@@ -12,13 +12,14 @@ use open qw(:std :utf8);
 # $target is the directory it should be saved to
 sub downloadFeed
 {
-    if(@_ < 2) {die("Not enough arguments supplied to downloadFeed()")}
+    if(@_ < 2){die("Not enough arguments supplied to downloadFeed()")}
     my ($source, $target) = @_;    
     
-    # Download the RSS feed
+    # Download the RSS feed,
+    # Unless it already exists and $opt_keep is set
     # TODO: Don't save if --dry-run is enabled
     my $feed_file = $target."/feed.rss";
-    unless($opt_keep && -e $feed_file)
+    unless(-e $feed_file && $opt_keep)
     {
         printv("Downloading feed\n",1);
         downloadFile($source, $feed_file);
@@ -28,13 +29,16 @@ sub downloadFeed
         printv("Keeping preexisting feed file\n",1);
     }
     
+    # Read the RSS feed from the file
+    # https://metacpan.org/pod/XML::RSS::Parser::Feed
     my $parser = XML::RSS::Parser->new;
     my $filehandle = FileHandle->new($feed_file);
-    my $feed = $parser->parse_file($filehandle); # https://metacpan.org/pod/XML::RSS::Parser::Feed
+    my $feed = $parser->parse_file($filehandle);
     
-    # Iterate over the items
+    # Iterate over the feed items
+    #     https://metacpan.org/pod/XML::RSS::Parser::Element
     my $ignoredcount, $downloadcount;
-    foreach ($feed->items) # https://metacpan.org/pod/XML::RSS::Parser::Element
+    foreach ($feed->items)
     {
         # Get important data from the item
         my $title = $_->query('title')->text_content;
@@ -55,6 +59,7 @@ sub downloadFeed
         
         # Target paths for this episode
         my $clean_title = clean_filename($title);
+        
         my $description_path = $target."/".$clean_title.".description.html";
         my $audio_path = $target."/".$clean_title." - ".basename($url);
         
@@ -68,7 +73,8 @@ sub downloadFeed
             unless(-e $description_path && !$opt_force)
             {
                 printv("\tWriting show notes to ".$description_path."\n",1);
-                unless($opt_dry){string_to_file($description, $description_path)}
+                string_to_file($description, $description_path)
+                    unless($opt_dry);
             }
             else
             {
@@ -79,7 +85,8 @@ sub downloadFeed
             unless(-e $audio_path && !$opt_force)
             {
                 printv("\tDownloading ".$url." to ".$audio_path."\n",1);
-                unless($opt_dry){downloadFile($url, $audio_path)}
+                downloadFile($url, $audio_path)
+                    unless($opt_dry);
             }
             else
             {
@@ -97,14 +104,11 @@ sub downloadFeed
     }
     
     # Print stats
-    if($downloadcount > 0)
-    {
-        printv("Downloaded ".$downloadcount." new episodes\n");
-    }
-    if($ignorecount > 0)
-    {
-        printv("Ignored ".$ignorecount." episodes\n");
-    }
+    printv("Downloaded ".$downloadcount." new episodes\n")
+        if($downloadcount > 0);
+    
+    printv("Ignored ".$ignorecount." episodes\n");
+        if($ignorecount > 0)
 }
 
 # Download a file
@@ -144,25 +148,26 @@ sub string_to_file
     close(FILE);
 }
 
-# Replace all non-alphanumeric characters with "-"
+# Replace everything with a dash (-) that is not a letter, number, dash, dot or space,
+# so the given string can be used as a filename
 # https://perldoc.perl.org/perlre.html
 sub clean_filename
 {
-    my $filename = shift;
+    my $filename = shift; # Get the first argument
     
     if(defined($filename))
     {
         # Replace everything with a dash (-) that is not a letter, number, dash, dot or space
         $filename =~ s/[^A-Za-z0-9\-\.\s]/-/g;
         
-        # If a dash has whitespace on ONE side, remove that whitespace
+        # If a dash has whitespace on ONE side, put one space on both sides of that dash
         # This occurs, for example, when the original string contained a number followed by a colon
-        # Example: abc 1- abc -> abc 1-abc
+        # Example: abc 1- abc -> abc 1 - abc
         # Do NOT match abc - abc
-        # (?<!\s) = negative lookbehind
+        # (?<!\s) = negative lookbehind (matches if the dash is NOT preceded by whitespace)
         $filename =~ s/(?<!\s)-\s/ - /g;
         
-        # (?!\s) = negative lookahead
+        # (?!\s) = negative lookahead (matches if the dash is NOT succeeded by whitespace)(
         $filename =~ s/\s-(?!\s)/ - /g;
         
         return($filename);

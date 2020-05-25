@@ -24,8 +24,10 @@ Usage
     
 Valid arguments
 ---------------
+You can try them out by using the -n|--dry-run flag
     --keep,    -k: Don't refresh the feed file if it has already been downloaded
     --date,    -d: Prepend the publishing date to the filename for improved sorting
+    --date-behind: If -d is set, the date will be appended instead of prepended. Implies -d
     --verbose, -v: Display more information about what's happening, e.g. the exact file names being written to
     --quiet,   -q: Only display errors, you can use this when running from cron
     --dry-run, -n: Display what would happen without doing it. The RSS feed will be downloaded regardless

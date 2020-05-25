@@ -51,7 +51,14 @@ sub downloadFeed
             # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
             $date = DateTime::Format::RSS->parse_datetime($date)->ymd;
         
-            $title = $date." - ".$title;
+            unless($opt_date_behind)
+            {
+                $title = $date." - ".$title;
+            }
+            else
+            {
+                $title = $title." - ".$date;
+            }
         }
         
         my $url   = $_->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
@@ -107,8 +114,8 @@ sub downloadFeed
     printv("Downloaded ".$downloadcount." new episodes\n")
         if($downloadcount > 0);
     
-    printv("Ignored ".$ignorecount." episodes\n");
-        if($ignorecount > 0)
+    printv("Ignored ".$ignorecount." episodes\n")
+        if($ignorecount > 0);
 }
 
 # Download a file

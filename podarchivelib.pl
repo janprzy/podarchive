@@ -31,8 +31,15 @@ sub downloadFeed
         printv("Keeping preexisting feed file\n",1);
     }
     
-    # Create an HTML file for improved viewing of the archive
-    my $html = "<html>\n<body>";
+    # Create an HTML containing an overview of the archive
+    unless($opt_no_overview)
+    {
+        my $html = "<html>";
+        $html .= "\n<body>";
+        $html .= "\n<head>";
+        $html .= "\n<title>Podcast overview</title>";
+        $html .= "\n</head>";
+    }
     
     # Read the RSS feed from the file
     # https://metacpan.org/pod/XML::RSS::Parser::Feed
@@ -91,10 +98,14 @@ sub downloadFeed
         my $audio_path_rel = $clean_title." - ".basename($url);
         my $audio_path = $target."/".$audio_path_rel;
         
-        $html .= "\n<hr>";
-        $html .= "\n<h2>".$title."</h2>";
-        $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
-        $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
+        # Add this episode to the overview
+        unless($opt_no_overview)
+        {
+            $html .= "\n<hr>";
+            $html .= "\n<h2>".$title."</h2>";
+            $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
+            $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
+        }
         
         
         # Ignore episodes that have already been downloaded, unless $opt_force is true
@@ -150,9 +161,9 @@ sub downloadFeed
     
     # Finish writing index.html
     # This will overwrite any existing index.html
-    $html .= "</body>\n</html>";
-    unless($opt_dry || $opt_no_overview)
+    unless($opt_no_overview)
     {
+        $html .= "</body>\n</html>";
         $html_path = $target."/index.html";
         string_to_file($html, $html_path, 1);
         printv("Wrote overview to ".$html_path."\n",1);

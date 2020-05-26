@@ -1,6 +1,6 @@
-podcast-archiver
-================
-This is a simple script to archive podcasts. It takes the URL of an RSS feed and the path of a target directory as arguments.
+podarchive
+==========
+This is a simple script for archiving podcasts. It takes the URL of an RSS feed and the path of a target directory as arguments.
 
 If an episode is already downloaded, it will not be downloaded again, unless the `-f|--force` flag is set.
 

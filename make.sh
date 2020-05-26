@@ -3,6 +3,11 @@
 
 # pp fails to detect and include some necessary modules, these need to be manually added via the '-M' flags
 
+# This command was tested on:
+# [x] macOS
+# [ ] Linux
+# [ ] FreeBSD
+
 pp -v cli.pl podarchivelib.pl \
    -o cli \
  -M XML::RSS::Parser::Element\

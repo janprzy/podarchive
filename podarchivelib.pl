@@ -109,7 +109,7 @@ sub downloadFeed
                     $description .= "\n<title>".$title."</title>";
                     $description .= "\n</head>";
                     $description .= "\n<body>";
-                    $description .= $_->query('description')->text_content;
+                    $description .= $feeditems[$i]->query('description')->text_content;
                     $description .= "\n</body>";
                     $description .= "\n</html>";
                     string_to_file($description, $description_path);

@@ -8,6 +8,7 @@ use DateTime::Format::RSS;
 # Prevent "wide character in string" messages (some show notes contain Emojis and other UTF-8 characters)
 use open qw(:std :utf8);
 
+# This function contains most of the logic
 # $source is a URI to the podcast's rss feed
 # $target is the directory it should be saved to
 sub downloadFeed
@@ -21,13 +22,19 @@ sub downloadFeed
     my $feed_file = $target."/feed.rss";
     unless(-e $feed_file && $opt_keep)
     {
-        printv("Downloading feed\n",1);
+        printv("Downloading feed...");
         downloadFile($source, $feed_file);
+        printv("Done\n");
     }
     else
     {
         printv("Keeping preexisting feed file\n",1);
     }
+    
+    # Create an HTML file for improved viewing of the archive
+    my $html = "
+    <html>
+        <body>";
     
     # Read the RSS feed from the file
     # https://metacpan.org/pod/XML::RSS::Parser::Feed
@@ -62,13 +69,15 @@ sub downloadFeed
         }
         
         my $url   = $_->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
-        my $description = $_->query('description')->text_content;
         
         # Target paths for this episode
         my $clean_title = clean_filename($title);
         
-        my $description_path = $target."/".$clean_title.".description.html";
-        my $audio_path = $target."/".$clean_title." - ".basename($url);
+        my $description_path_rel = $clean_title.".description.html";
+        my $description_path = $target."/".$description_path_rel;
+        
+        my $audio_path_rel = $clean_title." - ".basename($url);
+        my $audio_path = $target."/".$audio_path_rel;
         
         # Ignore episodes that have already been downloaded, unless $opt_force is true
         # The existence of each individual file will be checked again in case only one of them was missing.
@@ -80,8 +89,19 @@ sub downloadFeed
             unless(-e $description_path && !$opt_force)
             {
                 printv("\tWriting show notes to ".$description_path."\n",1);
-                string_to_file($description, $description_path)
-                    unless($opt_dry);
+                
+                unless($opt_dry)
+                {
+                    my $description = "<html>";
+                    $description .= "\n<head>";
+                    $description .= "\n<title>".$title."</title>";
+                    $description .= "\n</head>";
+                    $description .= "\n<body>";
+                    $description .= $_->query('description')->text_content;
+                    $description .= "\n</body>";
+                    $description .= "\n</html>";
+                    string_to_file($description, $description_path);
+                }
             }
             else
             {
@@ -108,6 +128,7 @@ sub downloadFeed
             printv("Ignoring: ".$title."\n",1);
             $ignorecount++;
         }
+        
     }
     
     # Print stats

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # For debugging
-use Data::Dumper;
+# use Data::Dumper;
 
 use Getopt::Long; # Docs: https://perldoc.perl.org/Getopt/Long.html#Mixing-command-line-option-with-other-arguments
 Getopt::Long::Configure ("bundling");
@@ -41,7 +41,9 @@ my($source, $target)=@ARGV;
 # Where $source and $target required arguments supplied?
 unless($source && $target)
 {
-    die("Not enough arguments! Both an RSS feed and a target directory are required\n");
+    print("Not enough arguments! Both an RSS feed and a target directory are required\n");
+    print_help();
+    exit;
 }
 
 # TODO: Create directory if it doesn't exist, only fail if the parent directory is also missing

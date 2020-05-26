@@ -18,16 +18,16 @@ and
 
 Usage
 -----
-    cd podcast-archiver
-    ./cli.pl [options] rss_feed_url target_directory
-    
+    cli.pl [options] rss_feed_url target_directory
+
+For help type cli.pl -h
     
 Valid arguments
 ---------------
 You can try them out by using the -n|--dry-run flag
 
     --keep,    -k: Don't refresh the feed file if it has already been downloaded
-    --date,    -d: Prepend the publishing date to the filename for improved sorting
+    --date,    -d: Prepend the publishing date to the filename for improved sorting. This would be useful for all podcasts that dont't neatly include the number in every episode's title
     --date-behind: If -d is set, the date will be appended instead of prepended. Implies -d
     --verbose, -v: Display more information about what's happening, e.g. the exact file names being written to
     --quiet,   -q: Only display errors, you can use this when running from cron

@@ -16,11 +16,12 @@ use FindBin qw($Bin);
 require $Bin."/podarchivelib.pl";
 
 # Command line options
-our($opt_keep, $opt_date, $opt_date_behind, $opt_enum, $opt_verbose, $opt_quiet, $opt_dry, $opt_force, $opt_help);
+our($opt_keep, $opt_date, $opt_date_behind, $opt_no_overview, $opt_enum, $opt_verbose, $opt_quiet, $opt_dry, $opt_force, $opt_help);
 GetOptions('keep|k' => \$opt_keep,
            'date|d' => \$opt_date,
            'episode-number|e' => \$opt_enum,
            'date-behind' => \$opt_date_behind,
+           'no-overview' => \$opt_no_overview,
            'verbose|v' => \$opt_verbose,
            'quiet|q' => \$opt_quiet,
            'dry-run|n' => \$opt_dry,
@@ -61,7 +62,8 @@ sub print_help
 --keep,           -k: Don't refresh the feed file if it has already been downloaded
 --date,           -d: Add the publishing date to the filename for improved sorting
 --episode-number, -e: Prepend the episode number to the title for improved sorting
---date-behind:        If -d is set, the date will be appended instead of prepended. Implies -d
+--date-behind       : Append instead of prepend the date.. Implies -d.
+--no-overview       : Don't create an index.html file containing an overview of all episodes
 --verbose,        -v: Display more information about what's happening
 --quiet,          -q: Only display errors
 --dry-run,        -n: Display what would happen without doing it. The RSS feed will be downloaded regardless

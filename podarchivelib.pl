@@ -151,8 +151,12 @@ sub downloadFeed
     # Finish writing index.html
     # This will overwrite any existing index.html
     $html .= "</body>\n</html>";
-    string_to_file($html, $target."/index.html", 1)
-        unless($opt_dry);
+    unless($opt_dry || $opt_no_overview)
+    {
+        $html_path = $target."/index.html";
+        string_to_file($html, $html_path, 1);
+        printv("Wrote overview to ".$html_path."\n",1);
+    }
     
     # Print stats
     printv("Downloaded ".$downloadcount." new episodes\n")

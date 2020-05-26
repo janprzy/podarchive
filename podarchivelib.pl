@@ -149,8 +149,9 @@ sub downloadFeed
     }
     
     # Finish writing index.html
+    # This will overwrite any existing index.html
     $html .= "</body>\n</html>";
-    string_to_file($html, $target."/index.html")
+    string_to_file($html, $target."/index.html", 1)
         unless($opt_dry);
     
     # Print stats
@@ -185,10 +186,12 @@ sub downloadFile
 sub string_to_file
 {
     if(@_ < 2){die("Not enough arguments supplied to string_to_file()")}
-    my ($string, $file) = @_;
+    my ($string, $file, $overwrite) = @_;
     
-    # Die if the $file already exists, this function will not overwrite.
-    if(-e $file){die("Could not write to ".$file.", it alredy exists!") }
+    # Some validations
+    # If the $overwrite flag is false or unset, this function will fail if the file already exists
+    if(-d $file){die("Could not write to ".$file.", is a directory!")}
+    if(-e $file && !$overwrite){die("Could not write to ".$file.", it already exists!")}
     
     # The target directory needs to exist
     unless(-d dirname($file)){ die("Could not create ".$file.", no valid directory was provided.") }

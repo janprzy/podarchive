@@ -46,18 +46,20 @@ sub downloadFeed
     #     https://metacpan.org/pod/XML::RSS::Parser::Element
     my $ignoredcount, $downloadcount;
     
-    # TODO: Clean this up
+    # All items in the feed
+    # This is solved with 'for' instead of 'foreach' so the index $i doesn't need to be counted separately
+    # Number of all items: @feeditems
+    # One item: $feeditems[$i]
     my @feeditems = $feed->items;
-    my $i = 0; # Counter
-    foreach(@feeditems)
+    foreach my $i (0 .. @feeditems-1)
     {
         # Get important data from the item
-        my $title = $_->query('title')->text_content;
+        my $title = $feeditems[$i]->query('title')->text_content;
         
         # Prepend the publishing date to the title and the filename
         if($opt_date)
         {
-            my $date  = $_->query('pubDate')->text_content;
+            my $date  = $feeditems[$i]->query('pubDate')->text_content;
             
             # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
             $date = DateTime::Format::RSS->parse_datetime($date)->ymd;
@@ -78,7 +80,7 @@ sub downloadFeed
             $title = (@feeditems - $i)." - ".$title;
         }
         
-        my $url   = $_->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
+        my $url   = $feeditems[$i]->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
         
         # Target paths for this episode
         my $clean_title = clean_filename($title);
@@ -138,8 +140,6 @@ sub downloadFeed
             printv("Ignoring: ".$title."\n",1);
             $ignorecount++;
         }
-        
-        $i++;
     }
     
     # Print stats

@@ -12,4 +12,3 @@ TODO
         - Don't append original filename
     - Ignore show notes
     - Make regex-cleaning of the filename optional
-* The foreach loop is very sloppy and badly implemented

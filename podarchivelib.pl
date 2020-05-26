@@ -32,9 +32,7 @@ sub downloadFeed
     }
     
     # Create an HTML file for improved viewing of the archive
-    my $html = "
-    <html>
-        <body>";
+    my $html = "<html>\n<body>";
     
     # Read the RSS feed from the file
     # https://metacpan.org/pod/XML::RSS::Parser::Feed
@@ -82,7 +80,9 @@ sub downloadFeed
         
         my $url   = $feeditems[$i]->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
         
+        
         # Target paths for this episode
+        # Relative paths are needed for index.html
         my $clean_title = clean_filename($title);
         
         my $description_path_rel = $clean_title.".description.html";
@@ -90,6 +90,12 @@ sub downloadFeed
         
         my $audio_path_rel = $clean_title." - ".basename($url);
         my $audio_path = $target."/".$audio_path_rel;
+        
+        $html .= "\n<hr>";
+        $html .= "\n<h2>".$title."</h2>";
+        $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
+        $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
+        
         
         # Ignore episodes that have already been downloaded, unless $opt_force is true
         # The existence of each individual file will be checked again in case only one of them was missing.
@@ -141,6 +147,11 @@ sub downloadFeed
             $ignorecount++;
         }
     }
+    
+    # Finish writing index.html
+    $html .= "</body>\n</html>";
+    string_to_file($html, $target."/index.html")
+        unless($opt_dry);
     
     # Print stats
     printv("Downloaded ".$downloadcount." new episodes\n")

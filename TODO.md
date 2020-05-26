@@ -5,7 +5,8 @@ TODO
 * Progress bar
 * RSS feeds could be very large, only download if necessary
 * Also archive images embedded in the show notes
-* index.html for improved viewing
+* Make HTML file nicer
+* Overwrite HTML file instead of dying
 * Reasonable separation between logic and interface
 * More options
     - File format

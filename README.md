@@ -3,9 +3,9 @@ podarchive
 This is a simple script for archiving podcasts. It takes the URL of an RSS feed and the path of a target directory as arguments.
 
 If an episode is already downloaded, it will not be downloaded again, unless the `-f|--force` flag is set.
-
 If an episode is already present is determined by the filename. The script will decide how it _would_ name the file were it to be  downloaded, then see if that file already exists.
 
+An index.html file will be created in the target directory. This file contains an overview of all audio files, as well as links to the show notes.
 
 For each episode, two files will be created:
 

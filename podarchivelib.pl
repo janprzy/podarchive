@@ -45,7 +45,11 @@ sub downloadFeed
     # Iterate over the feed items
     #     https://metacpan.org/pod/XML::RSS::Parser::Element
     my $ignoredcount, $downloadcount;
-    foreach ($feed->items)
+    
+    # TODO: Clean this up
+    my @feeditems = $feed->items;
+    my $i = 0; # Counter
+    foreach(@feeditems)
     {
         # Get important data from the item
         my $title = $_->query('title')->text_content;
@@ -66,6 +70,12 @@ sub downloadFeed
             {
                 $title = $title." - ".$date;
             }
+        }
+        
+        # Prepend the episode number to the title. The typical feed will be ordered newest-to-oldest
+        if($opt_enum)
+        {
+            $title = (@feeditems - $i)." - ".$title;
         }
         
         my $url   = $_->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
@@ -129,6 +139,7 @@ sub downloadFeed
             $ignorecount++;
         }
         
+        $i++;
     }
     
     # Print stats

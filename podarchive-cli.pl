@@ -68,25 +68,171 @@ unless(-d $target)
     die($target." is not a valid target directory!\n");
 }
 
-downloadFeed($source, $target);
 
-sub print_help
+# === Most of the logic ===========================================================================
+
+# Download the RSS feed,
+# Unless it already exists and $opt_keep is set
+# TODO: Don't save if --dry-run is enabled
+my $feed_file = $target."/feed.rss";
+unless(-e $feed_file && $opt_keep)
 {
-    print("Command usage:
---keep,           -k: Don't refresh the feed file if it has already been downloaded
---date,           -d: Add the publishing date to the filename for improved sorting
---episode-number, -e: Prepend the episode number to the title for improved sorting
---date-behind       : Append instead of prepend the date. Implies -d.
---no-overview       : Don't create an index.html file containing an overview of all episodes
---verbose,        -v: Display more information about what's happening
---quiet,          -q: Only display errors
---dry-run,        -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
---force,          -f: Force redownload of all episodes regardless if they're already downloaded
---help,           -h: Display this help
-[Feed URL]
-[Target directory]
-");
+    printv("Downloading feed...");
+    downloadFile($source, $feed_file);
+        printv("Done\n");
 }
+else
+{
+    printv("Keeping preexisting feed file\n",1);
+}
+
+# Create an HTML file containing an overview of the archive
+my $html;
+unless($opt_no_overview)
+{
+    $html = "<html>";
+    $html .= "\n<body>";
+    $html .= "\n<head>";
+    $html .= "\n<title>Podcast overview</title>";
+    $html .= "\n</head>";
+}
+
+# Read the RSS feed from the file
+# https://metacpan.org/pod/XML::RSS::Parser::Feed
+my $parser = XML::RSS::Parser->new;
+my $filehandle = FileHandle->new($feed_file);
+my $feed = $parser->parse_file($filehandle);
+
+# Iterate over the feed items
+#     https://metacpan.org/pod/XML::RSS::Parser::Element
+my $ignorecount = 0;
+my $downloadcount = 0;
+
+# All items in the feed
+# This is solved with 'for' instead of 'foreach' so the index $i doesn't need to be counted separately
+# Number of all items: @feeditems
+# One item: $feeditems[$i]
+my @feeditems = $feed->items;
+for my $i (0 .. @feeditems-1)
+{
+    # Get important data from the item
+    my $title = $feeditems[$i]->query('title')->text_content;
+
+    # Prepend the publishing date to the title and the filename
+    if($opt_date)
+    {
+        my $date  = $feeditems[$i]->query('pubDate')->text_content;
+    
+        # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
+        $date = DateTime::Format::RSS->parse_datetime($date)->ymd;
+
+        unless($opt_date_behind)
+        {
+	        $title = $date." - ".$title;
+        }
+        else
+        {
+	        $title = $title." - ".$date;
+        }
+    }
+
+    # Prepend the episode number to the title. The typical feed will be ordered newest-to-oldest
+    if($opt_enum)
+    {
+        $title = (@feeditems - $i)." - ".$title;
+    }
+
+    my $url   = $feeditems[$i]->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
+
+    # Target paths for this episode
+    # Relative paths are needed for index.html
+    my $clean_title = clean_filename($title);
+
+    my $description_path_rel = $clean_title.".description.html";
+    my $description_path = $target."/".$description_path_rel;
+
+    my $audio_path_rel = $clean_title." - ".basename($url);
+    my $audio_path = $target."/".$audio_path_rel;
+
+    # Add this episode to the overview
+    unless($opt_no_overview)
+    {
+        $html .= "\n<hr>";
+        $html .= "\n<h2>".$title."</h2>";
+        $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
+        $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
+    }
+
+
+    # Ignore episodes that have already been downloaded, unless $opt_force is true
+    # The existence of each individual file will be checked again in case only one of them was missing.
+    unless((-e $description_path && -e $audio_path) && !$opt_force)
+    {
+        printv($title."\n");
+
+        # Write show notes
+        unless(-e $description_path && !$opt_force)
+        {
+	        printv("\tWriting show notes to ".$description_path."\n",1);
+	
+	        unless($opt_dry)
+	        {
+	            my $description = "<html>";
+	            $description .= "\n<head>";
+	            $description .= "\n<title>".$title."</title>";
+	            $description .= "\n</head>";
+	            $description .= "\n<body>";
+	            $description .= $feeditems[$i]->query('description')->text_content;
+	            $description .= "\n</body>";
+	            $description .= "\n</html>";
+	            string_to_file($description, $description_path);
+	        }
+        }
+        else
+        {
+	        printv("Show notes already exist at ".$description_path."\n");
+        }
+
+        # Download Audio file
+        unless(-e $audio_path && !$opt_force)
+        {
+	        printv("\tDownloading ".$url." to ".$audio_path."\n",1);
+	        downloadFile($url, $audio_path)
+	            unless($opt_dry);
+        }
+        else
+        {
+	        printv("Audio already exists at ".$audio_path."\n");
+        }
+    
+        $downloadcount++;
+    }
+    else
+    {
+        # Display ignored episodes in verbose mode
+        printv("Ignoring: ".$title."\n",1);
+        $ignorecount++;
+    }
+}
+
+# Finish writing index.html
+# This will overwrite any existing index.html
+unless($opt_no_overview)
+{
+    $html .= "</body>\n</html>";
+    my $html_path = $target."/index.html";
+    string_to_file($html, $html_path, 1);
+    printv("Wrote overview to ".$html_path."\n",1);
+}
+
+# Print stats
+printv("Downloaded ".$downloadcount." new episodes\n")
+    if($downloadcount > 0);
+
+printv("Ignored ".$ignorecount." episodes\n")
+    if($ignorecount > 0);
+
+# =================================================================================================
 
 # Print with 3 different verbosities
 # -1 - Print even if the "quiet"-option is set
@@ -105,175 +251,22 @@ sub printv
     }
 }
 
-# This function contains most of the logic
-# $source is a URI to the podcast's rss feed
-# $target is the directory it should be saved to
-sub downloadFeed
+sub print_help
 {
-    if(@_ < 2){die("Not enough arguments supplied to downloadFeed()")}
-    my ($source, $target) = @_;    
-    
-    # Download the RSS feed,
-    # Unless it already exists and $opt_keep is set
-    # TODO: Don't save if --dry-run is enabled
-    my $feed_file = $target."/feed.rss";
-    unless(-e $feed_file && $opt_keep)
-    {
-        printv("Downloading feed...");
-        downloadFile($source, $feed_file);
-        printv("Done\n");
-    }
-    else
-    {
-        printv("Keeping preexisting feed file\n",1);
-    }
-    
-    # Create an HTML file containing an overview of the archive
-    my $html;
-    unless($opt_no_overview)
-    {
-        $html = "<html>";
-        $html .= "\n<body>";
-        $html .= "\n<head>";
-        $html .= "\n<title>Podcast overview</title>";
-        $html .= "\n</head>";
-    }
-    
-    # Read the RSS feed from the file
-    # https://metacpan.org/pod/XML::RSS::Parser::Feed
-    my $parser = XML::RSS::Parser->new;
-    my $filehandle = FileHandle->new($feed_file);
-    my $feed = $parser->parse_file($filehandle);
-    
-    # Iterate over the feed items
-    #     https://metacpan.org/pod/XML::RSS::Parser::Element
-    my $ignorecount = 0;
-    my $downloadcount = 0;
-    
-    # All items in the feed
-    # This is solved with 'for' instead of 'foreach' so the index $i doesn't need to be counted separately
-    # Number of all items: @feeditems
-    # One item: $feeditems[$i]
-    my @feeditems = $feed->items;
-    foreach my $i (0 .. @feeditems-1)
-    {
-        # Get important data from the item
-        my $title = $feeditems[$i]->query('title')->text_content;
-        
-        # Prepend the publishing date to the title and the filename
-        if($opt_date)
-        {
-            my $date  = $feeditems[$i]->query('pubDate')->text_content;
-            
-            # Change date format to ISO8601 - https://metacpan.org/pod/release/MSERGEANT/Time-Piece-1.20/Piece.pm
-            $date = DateTime::Format::RSS->parse_datetime($date)->ymd;
-        
-            unless($opt_date_behind)
-            {
-                $title = $date." - ".$title;
-            }
-            else
-            {
-                $title = $title." - ".$date;
-            }
-        }
-        
-        # Prepend the episode number to the title. The typical feed will be ordered newest-to-oldest
-        if($opt_enum)
-        {
-            $title = (@feeditems - $i)." - ".$title;
-        }
-        
-        my $url   = $feeditems[$i]->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
-        
-        
-        # Target paths for this episode
-        # Relative paths are needed for index.html
-        my $clean_title = clean_filename($title);
-        
-        my $description_path_rel = $clean_title.".description.html";
-        my $description_path = $target."/".$description_path_rel;
-        
-        my $audio_path_rel = $clean_title." - ".basename($url);
-        my $audio_path = $target."/".$audio_path_rel;
-        
-        # Add this episode to the overview
-        unless($opt_no_overview)
-        {
-            $html .= "\n<hr>";
-            $html .= "\n<h2>".$title."</h2>";
-            $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
-            $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
-        }
-        
-        
-        # Ignore episodes that have already been downloaded, unless $opt_force is true
-        # The existence of each individual file will be checked again in case only one of them was missing.
-        unless((-e $description_path && -e $audio_path) && !$opt_force)
-        {
-            printv($title."\n");
-        
-            # Write show notes
-            unless(-e $description_path && !$opt_force)
-            {
-                printv("\tWriting show notes to ".$description_path."\n",1);
-                
-                unless($opt_dry)
-                {
-                    my $description = "<html>";
-                    $description .= "\n<head>";
-                    $description .= "\n<title>".$title."</title>";
-                    $description .= "\n</head>";
-                    $description .= "\n<body>";
-                    $description .= $feeditems[$i]->query('description')->text_content;
-                    $description .= "\n</body>";
-                    $description .= "\n</html>";
-                    string_to_file($description, $description_path);
-                }
-            }
-            else
-            {
-                printv("Show notes already exist at ".$description_path."\n");
-            }
-        
-            # Download Audio file
-            unless(-e $audio_path && !$opt_force)
-            {
-                printv("\tDownloading ".$url." to ".$audio_path."\n",1);
-                downloadFile($url, $audio_path)
-                    unless($opt_dry);
-            }
-            else
-            {
-                printv("Audio already exists at ".$audio_path."\n");
-            }
-            
-            $downloadcount++;
-        }
-        else
-        {
-            # Display ignored episodes in verbose mode
-            printv("Ignoring: ".$title."\n",1);
-            $ignorecount++;
-        }
-    }
-    
-    # Finish writing index.html
-    # This will overwrite any existing index.html
-    unless($opt_no_overview)
-    {
-        $html .= "</body>\n</html>";
-        my $html_path = $target."/index.html";
-        string_to_file($html, $html_path, 1);
-        printv("Wrote overview to ".$html_path."\n",1);
-    }
-    
-    # Print stats
-    printv("Downloaded ".$downloadcount." new episodes\n")
-        if($downloadcount > 0);
-    
-    printv("Ignored ".$ignorecount." episodes\n")
-        if($ignorecount > 0);
+    print("Command usage:
+--keep,           -k: Don't refresh the feed file if it has already been downloaded
+--date,           -d: Add the publishing date to the filename for improved sorting
+--episode-number, -e: Prepend the episode number to the title for improved sorting
+--date-behind       : Append instead of prepend the date. Implies -d.
+--no-overview       : Don't create an index.html file containing an overview of all episodes
+--verbose,        -v: Display more information about what's happening
+--quiet,          -q: Only display errors
+--dry-run,        -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
+--force,          -f: Force redownload of all episodes regardless if they're already downloaded
+--help,           -h: Display this help
+[Feed URL]
+[Target directory]
+");
 }
 
 # Download a file

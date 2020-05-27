@@ -9,7 +9,7 @@
 # [ ] Linux
 # [ ] FreeBSD
 
-pp -v podarchive-cli.pl podarchivelib.pl \
+pp -v podarchive-cli.pl \
    -o podarchive-cli \
  -M XML::RSS::Parser::Element\
  -M XML::RSS::Parser::Feed\

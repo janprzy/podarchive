@@ -35,8 +35,13 @@ if($opt_help)
     exit;
 }
 
-# Some options imply other options
+
+# === Some options imply other options ============================================================
 if($opt_date_behind){$opt_date = 1}
+
+# This allows us to only check for $opt_no_overview, there's no or-condition needed.
+if($opt_dry){$opt_no_overview = 1} 
+# =================================================================================================
 
 my($source, $target)=@ARGV;
 
@@ -62,7 +67,7 @@ sub print_help
 --keep,           -k: Don't refresh the feed file if it has already been downloaded
 --date,           -d: Add the publishing date to the filename for improved sorting
 --episode-number, -e: Prepend the episode number to the title for improved sorting
---date-behind       : Append instead of prepend the date.. Implies -d.
+--date-behind       : Append instead of prepend the date. Implies -d.
 --no-overview       : Don't create an index.html file containing an overview of all episodes
 --verbose,        -v: Display more information about what's happening
 --quiet,          -q: Only display errors

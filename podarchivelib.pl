@@ -31,7 +31,7 @@ sub downloadFeed
         printv("Keeping preexisting feed file\n",1);
     }
     
-    # Create an HTML containing an overview of the archive
+    # Create an HTML file containing an overview of the archive
     unless($opt_no_overview)
     {
         my $html = "<html>";
@@ -189,7 +189,7 @@ sub downloadFile
     
     my $output_dir = dirname($output);
     
-    my $ff = File::Fetch->new(uri => $source);
+    my $ff = File::Fetch->new(uri => $source) or die("Invalid URL ".$source);
 
     # The file will be downloaded to $output_dir, then renamed to $output
     my $temp = $ff->fetch(to=>$output_dir) or die($ff->error);

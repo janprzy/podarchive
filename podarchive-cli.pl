@@ -5,7 +5,7 @@ use warnings;
 use File::Fetch; # https://perldoc.perl.org/File/Fetch.html
 use File::Basename;
 use XML::RSS::Parser; # https://metacpan.org/pod/XML::RSS::Parser
-use Filehandle;
+use FileHandle;
 use DateTime::Format::RSS;
 
 # Prevent "wide character in string" messages (some show notes contain Emojis and other UTF-8 characters)

@@ -18,7 +18,7 @@ and
 
 Usage
 -----
-    podarchive.pl [options] rss_feed_url target_directory
+    podarchive-cli.pl [options] rss_feed_url target_directory
 
 For help type cli.pl -h
     

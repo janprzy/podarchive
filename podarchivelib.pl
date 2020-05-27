@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use File::Fetch; # https://perldoc.perl.org/File/Fetch.html
 use File::Basename;
 use XML::RSS::Parser; # https://metacpan.org/pod/XML::RSS::Parser

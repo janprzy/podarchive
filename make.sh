@@ -7,7 +7,7 @@
 # This command was tested on:
 # [x] macOS
 # [ ] Linux
-# [ ] FreeBSD
+# [x] FreeBSD
 
 pp -v podarchive-cli.pl \
    -o podarchive-cli \

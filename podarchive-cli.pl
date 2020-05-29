@@ -160,7 +160,7 @@ for my $i (0 .. @feeditems-1)
         $html .= "\n<hr>";
         $html .= "\n<h2>".$title."</h2>";
         $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
-        $html .= "\n<audio controls><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
+        $html .= "\n<audio controls preload=none><source src=\"".$audio_path_rel."\" type=\"audio/mpeg\"></audio>";
     }
 
 

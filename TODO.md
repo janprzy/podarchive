@@ -9,7 +9,6 @@ TODO
 * Put the name of the podcast into the overview's <title> element
 * Support split RSS feeds
 * Reasonable separation between logic and interface
-* Add something like 'preload=none' to the <audio> elements
 * More options
     - File format
         - Don't append original filename

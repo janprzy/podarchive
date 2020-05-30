@@ -3,7 +3,7 @@ podarchive
 This is a simple script for archiving podcasts, including show notes. It takes the URL of an RSS feed and the path of a target directory as arguments.
 
 If an episode is already downloaded, it will not be downloaded again, unless the `-f|--force` flag is set.
-If an episode is already present is determined by the filename. The script will decide how it _would_ name the file were it to be downloaded, then see if that file already exists.
+The filename will be used to determine if an episode is already present. The script will decide how it would name the file were it to be downloaded, then see if that file already exists.
 
 There are no config files, everything is handled via command line arguments.
 
@@ -45,7 +45,7 @@ Operating Systems
 -----------------
 `podarchive` has been extensively tested on both macOS and FreeBSD, but it should also work on Linux.
 
-It has not been tested on Windows yet. There's some UNIX-specific stuff being used (most notably the forward slash ( / ) path separator, but supporting Windows is definitely on the roadmap.
+It has not been tested on Windows yet. There's some UNIX-specific stuff being used, most notably the forward slash ( / ) path separator, but supporting Windows is definitely on the roadmap.
 
 Compiled Binaries
 -----------------

@@ -101,8 +101,24 @@ unless($opt_no_overview)
 # https://metacpan.org/pod/XML::RSS::Parser::Feed
 my $parser = XML::RSS::Parser->new;
 my $filehandle = FileHandle->new($feed_file);
-my $feed = $parser->parse_file($filehandle);
 
+# Exit if the URL does not contain a valid feed.
+my $feed;
+unless($feed = $parser->parse_file($filehandle))
+{   
+    if($opt_keep)
+    {
+        printv("Fatal Error: Could not read RSS feed from local file \"".$feed_file."\"\n", -1);
+        printv("WARNING: The -k | --keep flag is set. You may want to remove it to re-download the RSS feed.\n", -1);
+    }
+    else
+    {
+        printv("Fatal Error: Could not read RSS feed from \"".$source."\". The file was saved to \"".$feed_file."\"\n", -1);
+    }
+    
+    exit();
+}
+    
 # Iterate over the feed items
 #     https://metacpan.org/pod/XML::RSS::Parser::Element
 my $ignorecount = 0;

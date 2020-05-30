@@ -69,32 +69,21 @@ unless(-d $target)
 }
 
 
-# === Most of the logic ===========================================================================
+# =================================================================================================
+# The inputs are valid, things are starting to happen
 
-# Download the RSS feed,
-# Unless it already exists and $opt_keep is set
+# Download the RSS feed, unless it already exists and $opt_keep is set
 # TODO: Don't save if --dry-run is enabled
 my $feed_file = $target."/feed.rss";
 unless(-e $feed_file && $opt_keep)
 {
     printv("Downloading feed...");
     downloadFile($source, $feed_file);
-        printv("Done\n");
+    printv("Done\n");
 }
 else
 {
     printv("Keeping preexisting feed file\n",1);
-}
-
-# Create an HTML file containing an overview of the archive
-my $html;
-unless($opt_no_overview)
-{
-    $html = "<html>";
-    $html .= "\n<body>";
-    $html .= "\n<head>";
-    $html .= "\n<title>Podcast overview</title>";
-    $html .= "\n</head>";
 }
 
 # Read the RSS feed from the file
@@ -102,14 +91,15 @@ unless($opt_no_overview)
 my $parser = XML::RSS::Parser->new;
 my $filehandle = FileHandle->new($feed_file);
 
-# Exit if the URL does not contain a valid feed.
+# parse_file() will return false on failure.
+# That means the downloaded file was not a valid RSS feed
 my $feed;
 unless($feed = $parser->parse_file($filehandle))
 {   
     if($opt_keep)
     {
         printv("Fatal Error: Could not read RSS feed from local file \"".$feed_file."\"\n", -1);
-        printv("WARNING: The -k | --keep flag is set. You may want to remove it to re-download the RSS feed.\n", -1);
+        printv("WARNING: The -k|--keep flag is set. You may want to remove it to download the feed again.\n", -1);
     }
     else
     {
@@ -118,13 +108,34 @@ unless($feed = $parser->parse_file($filehandle))
     
     exit();
 }
+
+# =================================================================================================
+# At this point, the feed has been downloaded and confirmed to be a feed.
+# We can start extracting its contents now.
+
+
+# This should be the name of the podcast
+my $name = $feed->query("title")->text_content;
+
+
+# Create an HTML file (index.html) containing an overview of the archive
+my $html;
+unless($opt_no_overview)
+{
+    $html = "<html>";
+    $html .= "\n<head>";
+    $html .= "\n<title>".$name."</title>";
+    $html .= "\n</head>";
+    $html .= "\n<body>";
+    $html .= "\n<h1>".$name."</h1>"
+}
+    
     
 # Iterate over the feed items
 #     https://metacpan.org/pod/XML::RSS::Parser::Element
 my $ignorecount = 0;
 my $downloadcount = 0;
 
-# All items in the feed
 # This is solved with 'for' instead of 'foreach' so the index $i doesn't need to be counted separately
 # Number of all items: @feeditems
 # One item: $feeditems[$i]
@@ -132,7 +143,7 @@ my @feeditems = $feed->items;
 printv(@feeditems." episodes\n", 1);
 for my $i (0 .. @feeditems-1)
 {
-    # Get important data from the item
+    # The title of this episode
     my $title = $feeditems[$i]->query('title')->text_content;
 
     # Prepend the publishing date to the title and the filename
@@ -162,14 +173,17 @@ for my $i (0 .. @feeditems-1)
     my $url   = $feeditems[$i]->query('enclosure')->attribute_by_qname("url"); # The audio file to be downloaded
 
     # Target paths for this episode
-    # Relative paths are needed for index.html
-    my $clean_title = clean_filename($title);
+    # Relative paths (ending in _rel) are used for the overview
+    
+    # Remove special characters from the title so it can be used as a filename
+    my $clean_title = clean_filename($title); 
 
     my $description_path_rel = $clean_title.".description.html";
     my $description_path = $target."/".$description_path_rel;
 
     my $audio_path_rel = $clean_title." - ".basename($url);
     my $audio_path = $target."/".$audio_path_rel;
+
 
     # Add this episode to the overview
     unless($opt_no_overview)

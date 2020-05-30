@@ -1,35 +1,34 @@
 podarchive
 ==========
-This is a simple script for archiving podcasts, including show notes. It takes the URL of an RSS feed and the path of a target directory as arguments.
+This is a simple script for archiving podcasts, including show notes. I made it mostly because I wanted it for myself, but it should be useful to other people as well.
 
-If an episode is already downloaded, it will not be downloaded again, unless the `-f|--force` flag is set.
-The filename will be used to determine if an episode is already present. The script will decide how it would name the file were it to be downloaded, then see if that file already exists.
+Behaviour
+---------
+The script takes an RSS feed URL and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded from the server and not altered (except for the title). The show notes will be saved to individual HTML files.
 
-There are no config files, everything is handled via command line arguments.
+The filename is used to determine if an episode has already been downloaded, in which case it will not be downloaded again (unless the `-f|--force` flag is set). The script will decide how it would name the file, then see if that file already exists. That means it will not recognize episodes that were downloaded with different settings (like `-d|--date` or `-e|--episode-number`).
 
 An index.html file will be created in the target directory. This file contains an overview of all audio files, as well as links to the show notes. Any index.html file that already exists will be overwritten.
 
 For each episode, two files will be created:
 
-    [date if -d|--date flag is set] - [title] - [filename on server including suffix]
+    [title] - [filename on server including suffix]
 
 and
 
     [title].description.html
-    
 
 Usage
 -----
-    podarchive-cli.pl [options] rss_feed_url target_directory
+    [perl] ./podarchive.pl [options] rss_feed_url target_directory
 
-For help type cli.pl -h
+_`[options]` can be placed wherever you want._
     
-Options
--------
-You can try them out by using the -n|--dry-run flag
+### Options
+_You can try them out by using the `-n|--dry-run` flag_
 
     --keep,           -k: Don't refresh the feed file if it has already been downloaded
-    --date,           -d: Prepend the publishing date to the filename for improved sorting. This would be useful for all podcasts that dont't neatly include the number in every episode's title
+    --date,           -d: Prepend the publishing date to the filename for improved sorting. This would be useful for all podcasts that don't neatly include the number in every episode's title
     --episode-number, -e: Prepend the episode number to the title for improved sorting. This is less reliable than using the publishing date, but will look a lot cleaner if successful. If -e and -d are used in conjunction, the number will be placed in front of the date
     --date-behind:        Append instead of prepend the date. Implies -d.
     --no-overview         Don't create an index.html file containing an overview of all episodes
@@ -41,17 +40,24 @@ You can try them out by using the -n|--dry-run flag
     [Feed URL]
     [Target directory]
 
+### Configuration
+There are no config files, everything is handled with command line arguments.
+
 Operating Systems
 -----------------
 `podarchive` has been extensively tested on both macOS and FreeBSD, but it should also work on Linux.
 
-It has not been tested on Windows yet. There's some UNIX-specific stuff being used, most notably the forward slash ( / ) path separator, but supporting Windows is definitely on the roadmap.
+It has not been tested on Windows yet. There's some UNIX-specific stuff being used, most notably the forward slash ( / ) path separator, but supporting Windows is on the roadmap.
+
+Dependencies
+------------
+Please refer the `use` calls at the beginning of `podarchive.pl` for the used modules. I'm not putting a list here because im 100% sure I would forget updating it. You can also just try to run it, Perl should give you an error message about missing modules.
 
 Compiled Binaries
 -----------------
-Running the Perl script directly requires some dependencies.
+The `make.sh` script uses [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which can then be run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
 
-The `make.sh` script uses [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which can then be run without having the dependencies installed. Since this still requires a lot of testing, I am not publishing binaries yet.
+Since this still requires a lot of testing, I am not publishing binaries at the moment.
 
 How I'm using it
 ----------------

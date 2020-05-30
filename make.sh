@@ -1,8 +1,8 @@
 #!/bin/sh
-# This command compiles this program into an executable binary file.
-# The binary file will be named "podarchive-cli". For some reason it needs to have the same name as the Perl file for this to work.
+# This compiles the program into an executable binary file.
+# The binary file will be named "podarchive". It only works on the same operating system it was created on.
 
-# pp fails to detect and include some necessary modules, these need to be manually added via the '-M' flags
+# pp fails to detect and include some necessary modules, these need to be added manually via the '-M' flags
 
 # This command was tested on:
 # [x] macOS

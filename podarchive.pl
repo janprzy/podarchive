@@ -4,6 +4,7 @@ use warnings;
 
 use File::Fetch; # https://perldoc.perl.org/File/Fetch.html
 use File::Basename;
+use File::Spec; # https://perldoc.perl.org/File/Spec.html
 use XML::RSS::Parser; # https://metacpan.org/pod/XML::RSS::Parser
 use FileHandle;
 use DateTime::Format::RSS;
@@ -74,16 +75,19 @@ unless(-d $target)
 
 # Download the RSS feed, unless it already exists and $opt_keep is set
 # TODO: Don't save if --dry-run is enabled
-my $feed_file = $target."/feed.rss";
+my $feed_file = File::Spec->join($target, "feed.rss");
 unless(-e $feed_file && $opt_keep)
 {
-    printv("Downloading feed...");
+    printv("Downloading feed", 0);
     downloadFile($source, $feed_file);
-    printv("Done\n");
+    printv("Done\n", 0);
+    printv("RSS feed saved at ".$feed_file."\n", 1);
 }
 else
 {
-    printv("Keeping preexisting feed file\n",1);
+    printv("Keeping preexisting feed file", 0);
+    printv(" at ".$feed_file, 1);
+    printv("\n", 0);
 }
 
 # Read the RSS feed from the file
@@ -179,10 +183,10 @@ for my $i (0 .. @feeditems-1)
     my $clean_title = clean_filename($title); 
 
     my $description_path_rel = $clean_title.".description.html";
-    my $description_path = $target."/".$description_path_rel;
+    my $description_path = File::Spec->join($target, $description_path_rel);
 
     my $audio_path_rel = $clean_title." - ".basename($url);
-    my $audio_path = $target."/".$audio_path_rel;
+    my $audio_path = File::Spec->join($target, $audio_path_rel);
 
 
     # Add this episode to the overview
@@ -251,7 +255,7 @@ for my $i (0 .. @feeditems-1)
 unless($opt_no_overview)
 {
     $html .= "</body>\n</html>";
-    my $html_path = $target."/index.html";
+    my $html_path = File::Spec->join($target, "index.html");
     string_to_file($html, $html_path, 1);
     printv("Wrote overview to ".$html_path."\n",1);
 }
@@ -343,8 +347,7 @@ sub string_to_file
     close(FILE);
 }
 
-# Replace everything with a dash (-) that is not a letter, number, dash, dot or space,
-# so the given string can be used as a filename
+# Replace everything with a dash (-) that is not a letter, number, dash, dot or space, so the given string can be used as a filename
 # https://perldoc.perl.org/perlre.html
 sub clean_filename
 {

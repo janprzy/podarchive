@@ -47,7 +47,7 @@ Operating Systems
 -----------------
 `podarchive` has been extensively tested on both macOS and FreeBSD, but it should also work on Linux.
 
-It has not been tested on Windows yet. There's some UNIX-specific stuff being used, most notably the forward slash ( / ) path separator, but supporting Windows is on the roadmap.
+It has not been tested on Windows yet.
 
 Dependencies
 ------------

@@ -262,9 +262,13 @@ sub printv
     
     unless(defined($level)){$level = 0;}
     
-    if($opt_verbose || $level<=0 && !$opt_quiet || $level<=-1 && $opt_quiet)
+    if($opt_verbose || $level==0 && !$opt_quiet)
     {
         print($string);
+    }
+    elsif($level<0)
+    {
+        print(STDERR $string);
     }
 }
 

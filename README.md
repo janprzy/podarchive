@@ -2,11 +2,11 @@ podarchive
 ==========
 This is a simple script for archiving podcasts, including show notes.
 
-I wasn't satisfied with the solutions that already existed. None of them seemed to save the show notes or let me customize the names of the downloaded files to my liking, so I had to make my own.
+I made this because I wanted to download and archive some podcasts I like, but wasn't satisfied with the solutions that already existed. None of them seemed to save the show notes or let me customize the names of the downloaded files to my liking.
 
 Behaviour
 ---------
-The script takes an RSS feed URL and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded from the server and not altered (except for the title). The show notes will be saved to individual HTML files.
+The script takes an the URL of an RSS and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded from the server and not altered (except for the title). The show notes will be saved to individual HTML files.
 
 The filename is used to determine if an episode has already been downloaded, in which case it will not be downloaded again (unless the `-f|--force` flag is set). The script will decide how it would name the file, then see if that file already exists. That means it will not recognize episodes that were downloaded with different settings (like `-d|--date` or `-e|--episode-number`).
 

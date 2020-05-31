@@ -1,10 +1,12 @@
 #!/bin/sh
-# This compiles the program into an executable binary file.
-# The binary file will be named "podarchive". It only works on the same operating system it was created on.
+# This script compiles podarchive into an executable binary.
+# The output file will be named "podarchive". It only works on the same operating system it was created on.
+
+# More information about pp: https://metacpan.org/pod/pp
 
 # pp fails to detect and include some necessary modules, these need to be added manually via the '-M' flags
 
-# This command was tested on:
+# This was tested on:
 # [x] macOS
 # [ ] Linux
 # [x] FreeBSD

@@ -47,7 +47,7 @@ Operating Systems
 -----------------
 `podarchive` has been extensively tested on both macOS and FreeBSD, but it should also work on Linux.
 
-It has not been tested on Windows yet.
+It seemed to work during my short tests in a Windows 10 VM.
 
 Dependencies
 ------------
@@ -55,7 +55,7 @@ Please refer the `use` calls at the beginning of `podarchive.pl` for the used mo
 
 Compiled Binaries
 -----------------
-The `make.sh` script uses [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which can then be run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
+The `make.sh` (UNIX) and `make.bat` (Windows) scripts use [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which can then be run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
 
 Since this still requires a lot of testing, I am not publishing binaries at the moment.
 

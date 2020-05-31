@@ -18,11 +18,6 @@ use open qw(:std :utf8);
 use Getopt::Long; # Docs: https://perldoc.perl.org/Getopt/Long.html#Mixing-command-line-option-with-other-arguments
 Getopt::Long::Configure ("bundling");
 
-# Get the parent directory of this file.
-# This will allow us to run it from anywhere, it will still be able to include other files in this directory
-# https://perldoc.perl.org/FindBin.html
-#use FindBin qw($Bin);
-
 #require $Bin."/podarchivelib.pl";
 
 # Command line options
@@ -78,7 +73,7 @@ unless(-d $target)
 my $feed_file = File::Spec->join($target, "feed.rss");
 unless(-e $feed_file && $opt_keep)
 {
-    printv("Downloading feed", 0);
+    printv("Downloading feed...", 0);
     downloadFile($source, $feed_file);
     printv("Done\n", 0);
     printv("RSS feed saved at ".$feed_file."\n", 1);

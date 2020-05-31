@@ -7,7 +7,10 @@
 
 pp -v podarchive.pl ^
    -o podarchive.exe ^
+   -l libexpat-1__.dll^
  -M XML::RSS::Parser::Element^
  -M XML::RSS::Parser::Feed^
  -M XML::RSS::Parser::Characters^
+ -M XML::Parser::Expat^
  -M XML::SAX::Expat
+

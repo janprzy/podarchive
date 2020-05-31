@@ -1,6 +1,8 @@
 podarchive
 ==========
-This is a simple script for archiving podcasts, including show notes. I made it mostly because I wanted it for myself, but it should be useful to other people as well.
+This is a simple script for archiving podcasts, including show notes.
+
+I wasn't satisfied with the solutions that already existed. None of them seemed to save the show notes or let me customize the names of the downloaded files to my liking, so I had to make my own.
 
 Behaviour
 ---------

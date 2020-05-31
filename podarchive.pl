@@ -318,7 +318,7 @@ sub downloadFile
     my $ff = File::Fetch->new(uri => $source) or die("Invalid URL ".$source);
 
     # The file will be downloaded to $output_dir, then renamed to $output
-    my $temp = $ff->fetch(to=>$output_dir) or die($ff->error);
+    my $temp = $ff->fetch(to=>$output_dir) or die("Failed to download ".$source);
     rename($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
 }
 

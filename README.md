@@ -43,11 +43,20 @@ _You can try them out by using the `-n|--dry-run` flag_
 ### Configuration
 There are no config files, everything is handled with command line arguments.
 
+### Compatible Podcasts
+`podarchive` should work with all podcasts using the standard RSS format.
+
+For example, I have confirmed that it works with these podcasts:
+
+* Hello Internet: http://www.hellointernet.fm/podcast?format=rss
+* Accidental Tech Podcast: https://atp.fm/rss
+* The Unmade Podcast: https://www.unmade.fm/episodes?format=rss
+
 Operating Systems
 -----------------
-`podarchive` has been extensively tested on both macOS and FreeBSD, but it should also work on Linux.
+`podarchive` has been extensively tested on both macOS and FreeBSD, it also works on Linux
 
-It seemed to work during my short tests in a Windows 10 VM.
+It seemed to work during my short tests in Windows 7 and 10 VMs.
 
 Dependencies
 ------------
@@ -55,7 +64,7 @@ Please refer the `use` calls at the beginning of `podarchive.pl` for the used mo
 
 Compiled Binaries
 -----------------
-The `make.sh` (UNIX) and `make.bat` (Windows) scripts use [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which can then be run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
+The `make.sh` (UNIX) and `make.bat` (Windows) scripts use [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which should then be able to run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
 
 Since this still requires a lot of testing, I am not publishing binaries at the moment.
 

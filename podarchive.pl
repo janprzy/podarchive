@@ -18,8 +18,6 @@ use open qw(:std :utf8);
 use Getopt::Long; # Docs: https://perldoc.perl.org/Getopt/Long.html#Mixing-command-line-option-with-other-arguments
 Getopt::Long::Configure ("bundling");
 
-#require $Bin."/podarchivelib.pl";
-
 # Command line options
 our($opt_keep, $opt_date, $opt_date_behind, $opt_no_overview, $opt_enum, $opt_verbose, $opt_quiet, $opt_dry, $opt_force, $opt_help);
 GetOptions('keep|k' => \$opt_keep,

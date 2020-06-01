@@ -70,9 +70,9 @@ Please refer the `use` calls at the beginning of `podarchive.pl` for the used mo
 
 Compiled Binaries
 -----------------
-The `make.sh` (UNIX) and `make.bat` (Windows) scripts use [`pp`](https://metacpan.org/pod/pp) to create an independent binary file, which should then be able to run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
+The `make.sh` (UNIX) and `make.bat` (Windows) scripts use [`pp`](https://metacpan.org/pod/pp) to create an executable binary file (`podarchive` on UNIX, `podarchive.exe` on Windows), which should then be able to run without having the dependencies installed. However, making the binary still requires the dependencies, so this is only useful if multiple computers **running the same operating system** are involved.
 
-Since this still requires a lot of testing, I am not publishing binaries at the moment.
+This whole process is not tested very well, that's why I'm not publishing binaries.
 
 How I'm using it
 ----------------

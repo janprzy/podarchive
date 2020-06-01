@@ -2,53 +2,57 @@ podarchive
 ==========
 This is a simple script for archiving podcasts, including show notes.
 
-I made this because I wanted to download and archive some podcasts I like, but wasn't satisfied with the solutions that already existed. None of them seemed to save the show notes or let me customize the names of the downloaded files to my liking.
+I made this because I wanted to download and archive some podcasts I like, but wasn't satisfied with the solutions that already exist. None of them seemed to save the show notes or let me customize the names of the downloaded files to my liking, so I made `podrachive` to solve that.
 
 Behaviour
 ---------
-The script takes an the URL of an RSS and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded from the server and not altered (except for the title). The show notes will be saved to individual HTML files.
+The script takes the URL of an RSS and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded and not altered, only renamed. For each episode, an HTML file will be created. It embeds the audio file and also contains the show notes.
 
-The filename is used to determine if an episode has already been downloaded, in which case it will not be downloaded again (unless the `-f|--force` flag is set). The script will decide how it would name the file, then see if that file already exists. That means it will not recognize episodes that were downloaded with different settings (like `-d|--date` or `-e|--episode-number`).
+The filename is used to determine if an episode has already been downloaded. Episodes will not be downloaded again, unless the `-f|--force` flag is set. The script will decide how it would name the file, then see if that file already exists. That means it will not recognize episodes that were downloaded with different settings (like `-d|--date` or `-e|--episode-number`).
 
-An index.html file will be created in the target directory. This file contains an overview of all audio files, as well as links to the show notes. Any index.html file that already exists will be overwritten.
-
-For each episode, two files will be created:
-
-    [title] - [filename on server including suffix]
-
-and
-
-    [title].description.html
+`podarchive` will also create an `index.html` file containing a list of all episodes, as well as links to their individual HTML files. This can be disabled using the `--no-overview` flag. Any `index.html` that already exists in the target directory will be overwritten.
 
 Usage
 -----
     [perl] ./podarchive.pl [options] rss_feed_url target_directory
 
-_`[options]` can be placed wherever you want._
     
 ### Options
-_You can try them out by using the `-n|--dry-run` flag_
+You can try them out by using the `-n|--dry-run` flag
 
-    --keep,           -k: Don't refresh the feed file if it has already been downloaded
-    --date,           -d: Prepend the publishing date to the filename for improved sorting. This would be useful for all podcasts that don't neatly include the number in every episode's title
-    --episode-number, -e: Prepend the episode number to the title for improved sorting. This is less reliable than using the publishing date, but will look a lot cleaner if successful. If -e and -d are used in conjunction, the number will be placed in front of the date
-    --date-behind:        Append instead of prepend the date. Implies -d.
-    --no-overview         Don't create an index.html file containing an overview of all episodes
-    --verbose,        -v: Display more information about what's happening, e.g. the exact file names being written to
-    --quiet,          -q: Only display errors, you can use this when running from cron
-    --dry-run,        -n: Display what would happen without doing it. The RSS feed will be downloaded regardless
-    --force,          -f: Force redownload of all episodes regardless if they're already downloaded. This does not override dry-run and can be used in conjunction with it.
-    --help,           -h: Display this help
-    [Feed URL]
-    [Target directory]
-
-### Configuration
-There are no config files, everything is handled with command line arguments.
+    --date,           -d  Prepend the publishing date to the filename for improved sorting.
+                          This is useful for all podcasts that don't neatly include the
+                          number in every episode's title.
+    
+    --episode-number, -e  Prepend the episode number to the title for improved sorting. This
+                          is less reliable than using the publishing date, but will look a lot
+                          cleaner if successful. If -e and -d are used in conjunction, the
+                          date will be placed in front of the number.
+                          
+    --date-behind         Append instead of prepend the date. Implies -d.
+    
+    --no-overview         Don't create an index.html file containing an overview of all episodes.
+    
+    --verbose,        -v  Display more information about what's happening, e.g. the exact file
+                          names being written to.
+    
+    --quiet,          -q  Only display errors. Use this when running from cron.
+    
+    --dry-run,        -n  Display what would happen without doing it. The RSS feed will be
+                          downloaded regardless.
+    
+    --keep,           -k  Don't refresh the feed file if it has already been downloaded
+    
+    --force,          -f  Force re-downloading of all episodes regardless of wether they've already
+                          been downloaded. This does not override -n | --dry-run and can be used in
+                          conjunction with it.
+    
+    --help,           -h  Display this help
 
 ### Compatible Podcasts
 `podarchive` should work with all podcasts using the standard RSS format.
 
-For example, I have confirmed that it works with these podcasts:
+These are some podcasts I have tried and confirmed to work:
 
 * Hello Internet: http://www.hellointernet.fm/podcast?format=rss
 * Accidental Tech Podcast: https://atp.fm/rss

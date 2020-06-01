@@ -6,7 +6,7 @@ I made this because I wanted to download and archive some podcasts I like, but w
 
 Behaviour
 ---------
-The script takes the URL of an RSS and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded and not altered, only renamed. For each episode, an HTML file will be created. It embeds the audio file and also contains the show notes.
+The script takes the URL of an RSS feed and a (local) target directory as arguments. The feed will be downloaded to the specified directory (as `feed.rss`) and then used to download the episodes. Audio files are downloaded and not altered, only renamed. For each episode, an HTML file will be created. It embeds the audio file and also contains the show notes.
 
 The filename is used to determine if an episode has already been downloaded. Episodes will not be downloaded again, unless the `-f|--force` flag is set. The script will decide how it would name the file, then see if that file already exists. That means it will not recognize episodes that were downloaded with different settings (like `-d|--date` or `-e|--episode-number`).
 

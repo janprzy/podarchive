@@ -126,7 +126,8 @@ unless($opt_no_overview)
     $html .= "\n<title>".$name."</title>";
     $html .= "\n</head>";
     $html .= "\n<body>";
-    $html .= "\n<h1>".$name."</h1>"
+    $html .= "\n<h1>".$name."</h1>";
+    $html .= "\n<ul>";
 }
     
     
@@ -174,23 +175,20 @@ for my $i (0 .. @feeditems-1)
     # Target paths for this episode
     # Relative paths (ending in _rel) are used for the overview
     
-    # Remove special characters from the title so it can be used as a filename
+    # Remove special characters from the title so it can be used in the filename
     my $clean_title = clean_filename($title); 
 
-    my $description_path_rel = $clean_title.".description.html";
+    # The "description" is an HTML page containing both the audio file and the show notes
+    my $description_path_rel = $clean_title.".html";
     my $description_path = File::Spec->join($target, $description_path_rel);
 
     my $audio_path_rel = $clean_title." - ".basename($url);
     my $audio_path = File::Spec->join($target, $audio_path_rel);
 
-
     # Add this episode to the overview
     unless($opt_no_overview)
     {
-        $html .= "\n<hr>";
-        $html .= "\n<h2>".$title."</h2>";
-        $html .= "\n<a href=\"".$description_path_rel."\">Show notes</a><br>";
-        $html .= "\n<audio controls preload=none src=\"".$audio_path_rel."\"></audio>";
+        $html .= "\n<li><a href=\"".$description_path_rel."\">".$title."</a></li>";
     }
 
 
@@ -212,6 +210,8 @@ for my $i (0 .. @feeditems-1)
 	            $description .= "\n<title>".$title."</title>";
 	            $description .= "\n</head>";
 	            $description .= "\n<body>";
+	            $description .= "\n<h1>".$title."</h1>";
+	            $description .= "\n<audio controls preload=none src=\"".$audio_path_rel."\"></audio>";
 	            $description .= $feeditems[$i]->query('description')->text_content;
 	            $description .= "\n</body>";
 	            $description .= "\n</html>";
@@ -249,7 +249,7 @@ for my $i (0 .. @feeditems-1)
 # This will overwrite any existing index.html
 unless($opt_no_overview)
 {
-    $html .= "</body>\n</html>";
+    $html .= "</ul>\n</body>\n</html>";
     my $html_path = File::Spec->join($target, "index.html");
     string_to_file($html, $html_path, 1);
     printv("Wrote overview to ".$html_path."\n",1);
@@ -304,7 +304,8 @@ sub print_help
 }
 
 # Download a file
-# $output is the target filename
+# $output is the target filename. If it already exists, it will be overwritten!
+# TODO: Write temporary file and return its path if no target filename was given
 sub downloadFile
 {
     if(@_ < 2){die("Not enough arguments supplied to downloadFile()")}
@@ -322,8 +323,8 @@ sub downloadFile
     rename($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
 }
 
-# Write a given string to a new file. Existing files will not be overwritten.
-# Should have used: https://learn.perl.org/examples/read_write_file.html
+# Write a given string to a new file. Existing files will only be overwritten if the 3rd argument is true.
+# Maybe should've used: https://learn.perl.org/examples/read_write_file.html
 sub string_to_file
 {
     if(@_ < 2){die("Not enough arguments supplied to string_to_file()")}
@@ -343,7 +344,7 @@ sub string_to_file
 }
 
 # Replace everything with a dash (-) that is not a letter, number, dash, dot or space, so the given string can be used as a filename
-# https://perldoc.perl.org/perlre.html
+# Help with RegEx: https://perldoc.perl.org/perlre.html
 sub clean_filename
 {
     my $filename = shift; # Get the first argument
@@ -357,9 +358,12 @@ sub clean_filename
         # This occurs, for example, when the original string contained a number followed by a colon
         # Example: abc 1- abc -> abc 1 - abc
         # Do NOT match abc - abc
+        
+        # This expression will match dashes with whitespace behind, but not in front of them: abc- abc
         # (?<!\s) = negative lookbehind (matches if the dash is NOT preceded by whitespace)
         $filename =~ s/(?<!\s)-\s/ - /g;
         
+        # This expression will match dashes that with whitespace in front of, but not behind them: abc -abc
         # (?!\s) = negative lookahead (matches if the dash is NOT succeeded by whitespace)(
         $filename =~ s/\s-(?!\s)/ - /g;
         

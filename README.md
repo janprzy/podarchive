@@ -60,7 +60,7 @@ These are some podcasts I have tried and confirmed to work:
 
 Operating Systems
 -----------------
-`podarchive` has been extensively tested on both macOS and FreeBSD, it also works on Linux
+`podarchive` has been extensively tested on both macOS and FreeBSD, but it also works on Linux.
 
 It seemed to work during my short tests in Windows 7 and 10 VMs.
 

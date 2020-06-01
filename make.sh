@@ -8,7 +8,7 @@
 
 # This was tested on:
 # [x] macOS
-# [ ] Linux
+# [x] Linux
 # [x] FreeBSD
 
 pp -v podarchive.pl \

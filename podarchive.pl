@@ -201,7 +201,7 @@ for my $i (0 .. @feeditems-1)
         # Write show notes
         unless(-e $description_path && !$opt_force)
         {
-	        printv("\tWriting show notes to ".$description_path."\n",1);
+	        printv("\tWriting episode page to ".$description_path."\n",1);
 	
 	        unless($opt_dry)
 	        {
@@ -215,7 +215,7 @@ for my $i (0 .. @feeditems-1)
 	            $description .= $feeditems[$i]->query('description')->text_content;
 	            $description .= "\n</body>";
 	            $description .= "\n</html>";
-	            string_to_file($description, $description_path);
+	            string_to_file($description, $description_path, $opt_force);
 	        }
         }
         else

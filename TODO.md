@@ -11,3 +11,4 @@ TODO
         - Don't append original filename
     - Ignore show notes
     - Make regex-cleaning of the filename optional
+* Tests

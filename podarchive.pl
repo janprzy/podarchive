@@ -210,7 +210,17 @@ for my $i (0 .. @feeditems-1)
 	            $description .= "\n<body>";
 	            $description .= "\n<h1>".$title."</h1>";
 	            $description .= "\n<audio controls preload=none src=\"".$audio_path_rel."\"></audio>";
-	            $description .= $feeditems[$i]->query('description')->text_content;
+	            
+	            # Some podcasts use 'content:encoded', description might still be set
+	            if(defined($feeditems[$i]->query('content:encoded')))
+	            {
+	                $description .= $feeditems[$i]->query('content:encoded')->text_content;
+	            }
+	            else
+	            {
+	                $description .= $feeditems[$i]->query('description')->text_content;
+	            }
+	            
 	            $description .= "\n</body>";
 	            $description .= "\n</html>";
 	            string_to_file($description, $description_path, $opt_force);

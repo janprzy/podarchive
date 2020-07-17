@@ -66,7 +66,7 @@ It seemed to work during my short tests in Windows 7 and 10 VMs.
 
 Dependencies
 ------------
-Please refer the `use` calls at the beginning of `podarchive.pl` for the used modules. I'm not putting a list here because im 100% sure I would forget updating it. You can also just try to run it, Perl should give you an error message about missing modules.
+Please refer to the `use` calls at the beginning of `podarchive.pl` for the used modules. I'm not putting a list here because im 100% sure I would forget updating it. You can also just try to run it, Perl should give you an error message about missing modules.
 
 Compiled Binaries
 -----------------

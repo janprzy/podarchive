@@ -7,8 +7,10 @@ TODO
 * Support split RSS feeds
 * Reasonable separation between logic and interface
 * More options
-    - File format
+    - Filenames
         - Don't append original filename
+        - Custom patterns for filenames
+        - Automatically detect what format to use
     - Ignore show notes
     - Make regex-cleaning of the filename optional
 * Tests

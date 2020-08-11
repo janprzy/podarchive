@@ -38,8 +38,7 @@ You can try them out by using the `-n|--dry-run` flag
     
     --quiet,          -q  Only display errors. Use this when running from cron.
     
-    --dry-run,        -n  Display what would happen without doing it. The RSS feed will be
-                          downloaded regardless.
+    --dry-run,        -n  Display what would happen without doing it
     
     --keep,           -k  Don't refresh the feed file if it has already been downloaded
     

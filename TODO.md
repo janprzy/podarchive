@@ -14,3 +14,4 @@ TODO
     - Ignore show notes
     - Make regex-cleaning of the filename optional
 * Tests
+* Don't require target directory on dry run

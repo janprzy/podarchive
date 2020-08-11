@@ -67,12 +67,22 @@ unless(-d $target)
 # The inputs are valid, things are starting to happen
 
 # Download the RSS feed, unless it already exists and $opt_keep is set
-# TODO: Don't save if --dry-run is enabled
+# If -n | --dry-run is set, download a temporary file that will be cleaned up afterwards.
 my $feed_file = File::Spec->join($target, "feed.rss");
+    
 unless(-e $feed_file && $opt_keep)
 {
     printv("Downloading feed...", 0);
-    downloadFile($source, $feed_file);
+    
+    unless($opt_dry)
+    {
+        downloadFile($source, $feed_file);
+    }
+    else
+    {
+        $feed_file = downloadFile($source);
+    }
+    
     printv("Done\n", 0);
     printv("RSS feed saved at ".$feed_file."\n", 1);
 }
@@ -313,22 +323,27 @@ sub print_help
 
 # Download a file
 # $output is the target filename. If it already exists, it will be overwritten!
-# TODO: Write temporary file and return its path if no target filename was given
+# If no $output path is provided, a temporary file will be written instead
 sub downloadFile
 {
-    if(@_ < 2){die("Not enough arguments supplied to downloadFile()")}
+    if(@_ < 1){die("Not enough arguments supplied to downloadFile()")}
     my ($source, $output) = @_;
     
-    # Die if file already exists, this function will not overwrite
-    # if(-e $output){die("Could not download ".$source." to ".$output.", it already exists.")}
-    
-    my $output_dir = dirname($output);
-    
     my $ff = File::Fetch->new(uri => $source) or die("Invalid URL ".$source);
-
-    # The file will be downloaded to $output_dir, then renamed to $output
-    my $temp = $ff->fetch(to=>$output_dir) or die("Failed to download ".$source);
-    rename($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
+    
+    if($output)
+    {
+        my $output_dir = dirname($output);
+        
+        # The file will be downloaded to $output_dir, then renamed to $output
+        my $temp = $ff->fetch(to=>$output_dir) or die("Failed to download ".$source);
+        rename($temp, $output) or die("Failed to rename downloaded file: ".$!."\n");
+    }
+    else
+    {
+        my $scalar;
+        my $temp = $ff->fetch(to => \$scalar) or die("Failed to download ".$source);
+    }
 }
 
 # Write a given string to a new file. Existing files will only be overwritten if the 3rd argument is true.

@@ -48,7 +48,7 @@ if($opt_dry){$opt_no_overview = 1}
 
 my($source, $target)=@ARGV;
 
-# Where $source and $target required arguments supplied?
+# Were the required arguments $source and $target supplied?
 unless($source && $target)
 {
     print("Not enough arguments! Both an RSS feed and a target directory are required\n");

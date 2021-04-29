@@ -7,7 +7,7 @@ use File::Basename;
 use File::Spec; # https://perldoc.perl.org/File/Spec.html
 use XML::RSS::Parser; # https://metacpan.org/pod/XML::RSS::Parser
 use FileHandle;
-use DateTime::Format::RSS;
+use DateTime::Format::RSS; # https://metacpan.org/pod/DateTime::Format::RSS
 
 # Prevent "wide character in string" messages (some show notes contain Emojis and other UTF-8 characters)
 use open qw(:std :utf8);

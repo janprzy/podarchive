@@ -42,7 +42,7 @@ You can try them out by using the `-n|--dry-run` flag
     
     --keep,           -k  Don't refresh the feed file if it has already been downloaded
     
-    --force,          -f  Force re-downloading of all episodes regardless of wether they've already
+    --force,          -f  Force re-downloading of all episodes regardless of whether they've already
                           been downloaded. This does not override -n | --dry-run and can be used in
                           conjunction with it.
     

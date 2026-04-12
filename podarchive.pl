@@ -103,6 +103,7 @@ my $filehandle = FileHandle->new($feed_file);
 my $feed;
 unless($feed = $parser->parse_file($filehandle))
 {   
+    printv($parser->errstr,-1);
     if($opt_keep)
     {
         printv("Fatal Error: Could not read RSS feed from local file \"".$feed_file."\"\n", -1);
